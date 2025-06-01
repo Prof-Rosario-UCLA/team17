@@ -4,7 +4,7 @@ import ThemeScreen from './components/ThemeScreen';
 import GameScreen from './components/GameScreen';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game'>('auth'); // 👈 Starts on "auth"
+  const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game'>('theme'); // 👈 Starts on "auth"
   const [selectedTheme, setSelectedTheme] = useState('');
 
   return (

@@ -1,5 +1,7 @@
-export default function ThemeScreen({ onThemeSelected }) {
-    // const [theme, setTheme] = useState('');
+import React, { useState } from 'react';
+ 
+export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (theme: string) => void }) {
+    const [theme, setTheme] = useState('');
 
     return (
         <div className="text-center">
