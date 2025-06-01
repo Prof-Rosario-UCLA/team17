@@ -34,7 +34,7 @@ export default function GameScreen({ theme }: { theme: string[] }) {
 		
 	    try{
 		const response = await openai.chat.completions.create({
-			model: 'gpt-4',
+			model: 'gpt-3.5-turbo',
 			messages: [{role: 'user', content: `Give me a creative trivia question that combines these two themes: "${selected[0]}" and "${selected[1]}". Only include the question.`,
 			},],
 		});
