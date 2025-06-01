@@ -7,16 +7,34 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true,   //only keep this here while in development wil need to store key in backend soon
 });
 
+function getTwoRandomThemes(themes: string[]): [string, string] | null {
+  if (themes.length < 1) return null;
+  if (themes.length < 2) return [themes[0],themes[0]];
 
-export default function GameScreen({ theme }: { theme: string }) {
+  const i = Math.floor(Math.random() * themes.length);
+  let j = Math.floor(Math.random() * themes.length);
+  while (j === i); {
+    j = Math.floor(Math.random() * themes.length);
+  } 
+  return [themes[i], themes[j]];
+}
+
+export default function GameScreen({ theme }: { theme: string[] }) {
     const [question, setQuestion] = useState('Loading trivia question');
 
     useEffect(() => {
 	async function fetchQuestion() {
+		const selected = getTwoRandomThemes(theme);
+		if (!selected) {
+			setQuestion('Not enough themes to generate a question.');
+			return;
+		}
+		const [theme1, theme2] = selected;
+		
 	    try{
 		const response = await openai.chat.completions.create({
 			model: 'gpt-4',
-			messages: [{role: 'user', content: `Give me a trivia question about the theme: "${theme}". Only include the question.`,
+			messages: [{role: 'user', content: `Give me a creative trivia question that combines these two themes: "${theme1}" and "${theme2}". Only include the question.`,
 			},],
 		});
 	    const result = response.choices[0].message.content;

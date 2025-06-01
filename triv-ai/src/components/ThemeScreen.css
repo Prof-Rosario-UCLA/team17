@@ -1,0 +1,60 @@
+.theme-screen {
+    width: 90vw; /* Full viewport width */
+    text-align: center;
+}
+.ready-screen {
+  position: fixed;
+  inset: 0;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  text-align: center;
+}
+.ready-button {
+  background: white;
+  color: #3b82f6;
+  padding: 1rem 2rem;
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.ready-screen h1 {
+  margin: 0; 
+  line-height: 1.2; 
+}
+.theme-header {
+    height: 15px;
+    background-color: #e5e7eb;
+    position: fixed;
+    top: 10px;
+    left: 50%;                        /* Center horizontally */
+    transform: translateX(-50%);      /* Offset half the width */
+    width: 90vw;
+    overflow: hidden;
+    z-index: 999;
+    border-radius: 4px; /* optional, for nicer edges */
+}
+.progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #3b82f6; 
+    width: 100%; 
+    animation: progress-bar 30s linear forwards;
+}
+
+@keyframes progress-bar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
