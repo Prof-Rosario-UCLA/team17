@@ -21,6 +21,7 @@ function getTwoRandomThemes(themes: string[]): [string, string] | null {
 
 export default function GameScreen({ theme }: { theme: string[] }) {
     const [question, setQuestion] = useState('Loading trivia question');
+	const [selectedThemes, setSelectedThemes] = useState<[string, string] | null>(null);
 
     useEffect(() => {
 	async function fetchQuestion() {
@@ -29,12 +30,12 @@ export default function GameScreen({ theme }: { theme: string[] }) {
 			setQuestion('Not enough themes to generate a question.');
 			return;
 		}
-		const [theme1, theme2] = selected;
+		setSelectedThemes(selected);
 		
 	    try{
 		const response = await openai.chat.completions.create({
 			model: 'gpt-4',
-			messages: [{role: 'user', content: `Give me a creative trivia question that combines these two themes: "${theme1}" and "${theme2}". Only include the question.`,
+			messages: [{role: 'user', content: `Give me a creative trivia question that combines these two themes: "${selected[0]}" and "${selected[1]}". Only include the question.`,
 			},],
 		});
 	    const result = response.choices[0].message.content;
@@ -49,7 +50,7 @@ export default function GameScreen({ theme }: { theme: string[] }) {
     return (
         <div className="text-center">
             <h2 className="text-2xl font-bold">Trivia Time!</h2>
-            <p className="mt-2">Theme: {theme}</p>
+            <p className="mt-2">Themes: {selectedThemes ? `${selectedThemes[0]} and ${selectedThemes[1]}` : 'Loading...'}</p>
 	    <p className="text-xl">{question}</p>
             More game UI will go here
         </div>
