@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ThemeScreen.css';
+import { initializeCanvas, addFloatingWord } from './ThemeCanvas';
 
 export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (theme: string[]) => void }) {
     const [allThemes, setAllThemes] = useState<string[]>([]);
@@ -10,6 +11,13 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
     const [countdown, setCountdown] = useState(timePerRound);
     const numberOfPlayers = 4;
    
+    useEffect(() => {
+    if (!isReadyScreen) {
+        
+        const id = setTimeout(() => initializeCanvas(), 50);
+        return () => clearTimeout(id);
+    }
+    }, [isReadyScreen]);
 
     useEffect(() => {
         if (!isReadyScreen && countdown > 0) {
@@ -36,6 +44,7 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
     const submitTheme = () => {
         if (themeInput) {
             setAllThemes((prev) => [...prev, themeInput]);
+            addFloatingWord(themeInput);
             setThemeInput('');
         }
     };
@@ -55,20 +64,25 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
                     <header className="theme-header">
                         <div className="progress-bar"/>
                     </header>
-                    <h2 className="text-xl mb-2">Player {playerIndex + 1}, pick your theme</h2>
-                    <input
-                        value={themeInput}
-                        onChange={(e) => setThemeInput(e.target.value)}
-                        className="border rounded p-2"
-                        placeholder="e.g. Space, History, Disney"
-                    />
-                    <button
-                        //onClick={() => onThemeSelected(theme)}
-                        onClick={submitTheme}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-                    >
-                       Submit
-                    </button>
+                    <div className='theme-wrapper'>
+                        <h2 className="text-xl mb-2">Player {playerIndex + 1}, pick your theme</h2>
+                        <canvas id="gameCanvas" className="theme-canvas"></canvas>
+                        <div>
+                            <input
+                                value={themeInput}
+                                onChange={(e) => setThemeInput(e.target.value)}
+                                className="border rounded p-2"
+                                placeholder="e.g. Space, History, Disney"
+                            />
+                            <button
+                                //onClick={() => onThemeSelected(theme)}
+                                onClick={submitTheme}
+                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+                            >
+                            Submit
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
