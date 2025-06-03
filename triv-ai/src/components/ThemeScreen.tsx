@@ -53,7 +53,7 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
             ) : (
                 <div>
                     <header className="theme-header">
-                        <div className="progress-bar"/>
+                        <div className="progress-bar"/> 
                     </header>
                     <h2 className="text-xl mb-2">Player {playerIndex + 1}, pick your theme</h2>
                     <input

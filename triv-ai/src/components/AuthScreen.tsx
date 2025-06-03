@@ -1,5 +1,5 @@
-import { GoogleLogin } from "@react-oauth/google"
-// import jwt_decode from "jwt-decode"
+import { GoogleLogin, googleLogout } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }) {
     return (
@@ -8,19 +8,19 @@ export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }
             <GoogleLogin
                 onSuccess={(credentialResponse) => {
                     console.log(credentialResponse)                    
-                    // const credential = credentialResponse.credential;
+                    const credential = credentialResponse.credential;
 
-                    // if (credential) {
-                    //     const userInfo: any = jwt_decode(credential);
-                    //     console.log('Decoded JWT:', userInfo);
+                    if (credential) {
+                        const userInfo: any = jwtDecode(credential);
+                        console.log('Decoded JWT:', userInfo);
 
-                    //     // Example fields you get:
-                    //     userInfo.name
-                    //     userInfo.email
-                    //     userInfo.picture
+                        // Example fields you get:
+                        userInfo.name
+                        userInfo.email
+                        userInfo.picture
 
-                    //     onLogin(userInfo); // pass user info to your app
-                    // }
+                        onLogin(userInfo); // pass user info to your app
+                    }
                 }}
                 onError={() => {
                     console.log("Login Failed");
