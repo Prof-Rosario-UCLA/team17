@@ -32,7 +32,7 @@
     height: 15px;
     background-color: #e5e7eb;
     position: fixed;
-    top: 50px;                        /* pushing progress bar below the user info bar */
+    top: 120px;                        /* pushing progress bar below the user info bar */
     left: 50%;                        /* Center horizontally */
     transform: translateX(-50%);      /* Offset half the width */
     width: 90vw;
@@ -62,6 +62,19 @@
   border: 2px solid black;
   display: block;
   margin: 0 auto;
+  border-radius: 8px;
+}
+
+.input-box {
+  color: #242424;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+  border: 2px solid #242424;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  outline: none;
 }
 
 

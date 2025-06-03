@@ -71,13 +71,13 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
                             <input
                                 value={themeInput}
                                 onChange={(e) => setThemeInput(e.target.value)}
-                                className="border rounded p-2"
+                                className="input-box"
                                 placeholder="e.g. Space, History, Disney"
                             />
                             <button
                                 //onClick={() => onThemeSelected(theme)}
                                 onClick={submitTheme}
-                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+                                
                             >
                             Submit
                             </button>

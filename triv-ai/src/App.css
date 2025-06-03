@@ -40,3 +40,33 @@
 .read-the-docs {
   color: #888;
 }
+
+/* .logout-button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.25rem 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+} */
+
+.logout-button:hover {
+  background-color: #6d6d6d;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  gap: 3rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
