@@ -6,6 +6,8 @@ export interface FloatingWord {
   dy: number;
   boxWidth?: number;
   boxHeight?: number;
+  scale?: number;
+  isScaling?: boolean;
 }
 
 let canvas: HTMLCanvasElement;
@@ -37,18 +39,26 @@ export function addFloatingWord(input: string) {
   if (!floatingWords.find(word => word.text === input)) {
     floatingWords.push({
       text: input,
-      x: Math.random() * (canvas.width * 0.8),
-      y: Math.random() * (canvas.height * 0.8),
+      x: canvas.width / 2,
+      y: canvas.height / 2,
       dx: (Math.random() - 0.5) * 5 + 1,
       dy: (Math.random() - 0.5) * 5 + 1,
+      scale: 4,          
+      isScaling: true      
     });
   }
 }
 
 
 function drawWord(wordObj: FloatingWord) {
-  
-  ctx.font = "16px Arial";
+  const scale = wordObj.scale ?? 1;
+  ctx.save();
+
+  ctx.translate(wordObj.x, wordObj.y);
+  ctx.scale(scale, scale);
+  ctx.translate(-wordObj.x, -wordObj.y);
+
+  ctx.font = `${16}px Arial`;
   const paddingX = 12;
   const paddingY = 6;
 
@@ -61,19 +71,18 @@ function drawWord(wordObj: FloatingWord) {
   wordObj.boxWidth = boxWidth;
   wordObj.boxHeight = boxHeight;
 
-  
   ctx.fillStyle = "#3b82f6";
   ctx.beginPath();
   ctx.roundRect(wordObj.x, wordObj.y, boxWidth, boxHeight, 6);
   ctx.fill();
 
-  
-  ctx.fillStyle = "#ffffff"; 
+  ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   ctx.fillText(wordObj.text, wordObj.x + paddingX, wordObj.y + paddingY);
-}
 
+  ctx.restore();
+}
 
 
 
@@ -82,18 +91,26 @@ function update(){
 
     //add motion
     floatingWords.forEach((word) => {
-        drawWord(word);
-
-        word.x += word.dx;
-        word.y += word.dy;
-        
-        //collisions 
-        if (word.x <= 0 || word.x + (word.boxWidth || 0) >= canvas.width) {
-        word.dx *= -1;
+        if (word.isScaling && word.scale !== undefined) {
+          word.scale -= 0.05;
+          if (word.scale <= 1) {
+            word.scale = 1;
+            word.isScaling = false;
+          }
         }
-        
-        if (word.y <= 0 || word.y + (word.boxHeight || 0) >= canvas.height) {
-        word.dy *= -1;
+        drawWord(word);
+        if (!word.isScaling) {
+          word.x += word.dx;
+          word.y += word.dy;
+          
+          //collisions 
+          if (word.x <= 0 || word.x + (word.boxWidth || 0) >= canvas.width) {
+          word.dx *= -1;
+          }
+          
+          if (word.y <= 0 || word.y + (word.boxHeight || 0) >= canvas.height) {
+          word.dy *= -1;
+          }
         }
     });
     requestAnimationFrame(update);
