@@ -8,7 +8,9 @@ export default function MultiplayerTest() {
   const [numberPlayers, setnumberPlayers] = useState(0);
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [status, setStatus] = useState('');
+  const [themeInput, setThemeInput] = useState('');
   const [userName, setUserName] = useState('');
+  const [themes, setThemes] = useState(['']);
   const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme'>('auth');
 
   useEffect(() => {
@@ -43,6 +45,9 @@ export default function MultiplayerTest() {
           break;
         case 'THEME_READY':
           setScreen('theme');
+          break;
+        case 'THEMES_SENT':
+          setThemes(msg.themes);
           break;
         case 'ERROR':
           setStatus(`Error: ${msg.message}`);
@@ -85,6 +90,18 @@ export default function MultiplayerTest() {
       roomCode: roomCode,
       userId,
     }));
+  };
+
+  const submitTheme = () => {
+    if (!themeInput.trim()) return;
+
+    socketRef.current?.send(JSON.stringify({
+      type: 'SUBMIT_THEME',
+      roomCode,
+      theme: themeInput.trim()
+    }));
+
+    setThemeInput('');
   };
 
   return (
@@ -152,6 +169,17 @@ export default function MultiplayerTest() {
       {screen === 'theme' && (
         <div className="space-y-4">
           <h1 className="text-xl font-bold">Submit the themes !</h1>
+          <input
+              value={themeInput}
+              onChange={(e) => setThemeInput(e.target.value)}
+              placeholder="e.g. Space, History, Disney"
+              className="border p-2"
+          />
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded"
+            onClick={submitTheme}
+          > Submit </button>
+          <div> current themes are {themes} </div>
         </div>
       )}
     </div>

@@ -99,6 +99,31 @@ wss.on('connection', (ws) => {
         await broadcastReadyCount(wss, roomCode);
         break;
       }
+
+      case 'SUBMIT_THEME': {
+        const { roomCode, theme} = msg;
+        const room = await Room.findOne({ roomCode });
+        ws.roomCode = roomCode; 
+        if (!room) {
+          ws.send(JSON.stringify({ type: 'ERROR', message: 'Room not found' }));
+          return;
+        }
+        room.themes.push(theme);
+        
+        await room.save();
+        
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
+              client.send(JSON.stringify({
+                type: 'THEMES_SENT',
+                roomCode,
+                themes: room.themes
+              }));
+            }
+          });
+        break;
+      }
+
     }
   });
 
