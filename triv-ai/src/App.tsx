@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import AuthScreen from './components/AuthScreen';
 import ThemeScreen from './components/ThemeScreen';
 import GameScreen from './components/GameScreen';
+import MultiplayerScreen from './components/MultiplayerScreen';
 import "./App.css";
 
 function App() {
   // states for the different modes of the SPA
-  const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game'>('auth'); // 👈 Starts on "auth"
+  const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game' | 'multiplayer'>('multiplayer'); // 👈 Starts on "auth"
   
   // themes of the trivia questions
   const [selectedTheme, setSelectedTheme] = useState('');
@@ -76,6 +77,9 @@ function App() {
         )}
         {currentScreen === 'game' && (
           <GameScreen theme={selectedTheme} user={user} />
+        )}
+        {currentScreen === 'multiplayer' && (
+          <MultiplayerScreen />
         )}
       </div>
     </div>
