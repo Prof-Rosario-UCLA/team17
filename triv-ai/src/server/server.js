@@ -117,7 +117,7 @@ wss.on('connection', (ws) => {
               client.send(JSON.stringify({
                 type: 'THEMES_SENT',
                 roomCode,
-                themes: room.themes
+                themes: theme
               }));
             }
           });

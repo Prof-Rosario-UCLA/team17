@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { addFloatingWord, initializeCanvas } from './ThemeCanvas';
+
 
 export default function MultiplayerTest() {
   const socketRef = useRef<WebSocket | null>(null);
@@ -47,7 +49,7 @@ export default function MultiplayerTest() {
           setScreen('theme');
           break;
         case 'THEMES_SENT':
-          setThemes(msg.themes);
+          if (msg.themes) addFloatingWord(msg.themes);
           break;
         case 'ERROR':
           setStatus(`Error: ${msg.message}`);
@@ -57,6 +59,12 @@ export default function MultiplayerTest() {
 
     return () => socketRef.current?.close();
   }, []);
+
+  useEffect(() => {
+    if (screen === 'theme') {
+      initializeCanvas();
+    }
+  }, [screen]);
 
   const handleCreateUser = () => {
     const id = crypto.randomUUID();   
@@ -169,6 +177,7 @@ export default function MultiplayerTest() {
       {screen === 'theme' && (
         <div className="space-y-4">
           <h1 className="text-xl font-bold">Submit the themes !</h1>
+          <canvas id="gameCanvas" className="mx-auto border w-full max-w-[800px] aspect-[4/3]"></canvas>
           <input
               value={themeInput}
               onChange={(e) => setThemeInput(e.target.value)}
