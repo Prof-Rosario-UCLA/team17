@@ -159,6 +159,7 @@ wss.on('connection', (ws) => {
                     }
                     The question should creatively combine these two themes: "${selectedThemes[0]}" and "${selectedThemes[1]}".
                     The question should be creative but **based on real, factual trivia** — nothing fictional or made-up and should be tailored for 10-30 year olds.
+                    The answer should not be the same as any of the themes listed above.
                     The correct answer MUST be the first element in the "choices" array.
                     Do not add any extra explanation or text — just return the raw JSON.`
                 }
