@@ -20,6 +20,7 @@ export default function MultiplayerTest() {
   const [remainingTime, setRemainingTime] = useState<number>(30);
   const [usedTheme, setUsedTheme] = useState(['']);
   const [question, setQuestion] = useState('');
+  const [answers, setAnswers] = useState(['']);
 
   useEffect(() => {
     roomCodeRef.current = roomCode;
@@ -79,7 +80,8 @@ export default function MultiplayerTest() {
           break;
         case 'QUESTION_SENT':
           if(msg.themes) setUsedTheme(msg.themes);
-          if(msg.result) setQuestion(msg.result);
+          if(msg.question) setQuestion(msg.question);
+          if(msg.answer) setAnswers(msg.answer);
           break;
         case 'ERROR':
           setStatus(`Error: ${msg.message}`);
@@ -232,7 +234,11 @@ export default function MultiplayerTest() {
       {screen === 'game' && (
         <div className="space-y-4">
           <h1 className="font-bold"> Game Time! Question based off of {usedTheme[0]} and {usedTheme[1]} !</h1>
-          <h1 className="font-bold"> Question {question} !</h1>
+          <div> Question {question} !</div>
+          <button>{answers[0]}</button>
+          <button>{answers[1]}</button>
+          <button>{answers[2]}</button>
+          <button>{answers[3]}</button>
         </div>
       )}
 

@@ -153,18 +153,18 @@ wss.on('connection', (ws) => {
                 {
                   role: 'user',
                   content: `Return ONLY a valid JSON object in this exact format:
-                            {
-                              "question": "Your question here?",
-                              "choices": ["Correct Answer", "Wrong Answer 1", "Wrong Answer 2", "Wrong Answer 3"]
-                            }
-                            The question should creatively combine these two themes: "${selectedThemes[0]}" and "${selectedThemes[1]}".
-                            The question should be creative but **based on real, factual trivia** — nothing fictional or made-up and should be tailored for 10-30 year olds.
-                            The correct answer MUST be the first element in the "choices" array.
-                            Do not add any extra explanation or text — just return the raw JSON.`
+                    {
+                      "question": "Your question here?",
+                      "choices": ["Correct Answer", "Wrong Answer 1", "Wrong Answer 2", "Wrong Answer 3"]
+                    }
+                    The question should creatively combine these two themes: "${selectedThemes[0]}" and "${selectedThemes[1]}".
+                    The question should be creative but **based on real, factual trivia** — nothing fictional or made-up and should be tailored for 10-30 year olds.
+                    The correct answer MUST be the first element in the "choices" array.
+                    Do not add any extra explanation or text — just return the raw JSON.`
                 }
               ]
             });
-            result = response.choices[0].message.content;
+            result = JSON.parse(response.choices[0].message.content);
           } catch (err) {
             console.log('error (chat-gpt)')
             result = 'Sorry, failed to generate a question.';
@@ -175,7 +175,8 @@ wss.on('connection', (ws) => {
                 type: 'QUESTION_SENT',
                 roomCode,
                 themes: selectedThemes,
-                result: result
+                question: result.question,
+                answer: result.choices
               }));
             }
           });
