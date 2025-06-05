@@ -4,6 +4,9 @@ import { addFloatingWord, initializeCanvas } from './ThemeCanvas';
 
 export default function MultiplayerTest() {
   const socketRef = useRef<WebSocket | null>(null);
+  const roomCodeRef = useRef<string | null>(null);
+  const userIdRef = useRef<string | null>(null);
+
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [userId, setuserId] = useState<string | null>(null);
   const [playersReady, setplayersReady] = useState(0);
@@ -13,7 +16,17 @@ export default function MultiplayerTest() {
   const [themeInput, setThemeInput] = useState('');
   const [userName, setUserName] = useState('');
   const [themes, setThemes] = useState(['']);
-  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme'>('auth');
+  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game'>('auth');
+  const [remainingTime, setRemainingTime] = useState<number>(30);
+  const [usedTheme, setUsedTheme] = useState(['']);
+  const [question, setQuestion] = useState('');
+
+  useEffect(() => {
+    roomCodeRef.current = roomCode;
+  }, [roomCode]);
+  useEffect(() => {
+    userIdRef.current = userId;
+  }, [userId]);
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:3001');
@@ -46,10 +59,27 @@ export default function MultiplayerTest() {
           setplayersReady(msg.playerReady);
           break;
         case 'THEME_READY':
-          setScreen('theme');
+          const endTime = msg.startTime + msg.duration;
+          const interval = setInterval(() => {
+            setScreen('theme');
+            const remaining = endTime - Date.now();
+            if (remaining <= 0) {
+              clearInterval(interval);
+              setRemainingTime(0);
+              setScreen('game');
+              gameReady();
+            } else {
+              setRemainingTime(Math.ceil(remaining / 1000));
+            }
+          }, 100);
+
           break;
         case 'THEMES_SENT':
           if (msg.themes) addFloatingWord(msg.themes);
+          break;
+        case 'QUESTION_SENT':
+          if(msg.themes) setUsedTheme(msg.themes);
+          if(msg.result) setQuestion(msg.result);
           break;
         case 'ERROR':
           setStatus(`Error: ${msg.message}`);
@@ -80,7 +110,7 @@ export default function MultiplayerTest() {
   const createRoom = () => {
     socketRef.current?.send(JSON.stringify({
       type: 'CREATE_ROOM',
-      userId,
+      userId: userIdRef.current,
     }));
   };
 
@@ -88,15 +118,15 @@ export default function MultiplayerTest() {
     socketRef.current?.send(JSON.stringify({
       type: 'JOIN_ROOM',
       roomCode: joinCodeInput.toUpperCase(),
-      userId
+      userId: userIdRef.current,
     }));
   };
 
   const playerReady = () => {
     socketRef.current?.send(JSON.stringify({
       type: 'PLAYER_READY',
-      roomCode: roomCode,
-      userId,
+      roomCode: roomCodeRef.current,
+      userId: userIdRef.current,
     }));
   };
 
@@ -105,11 +135,19 @@ export default function MultiplayerTest() {
 
     socketRef.current?.send(JSON.stringify({
       type: 'SUBMIT_THEME',
-      roomCode,
+      roomCode: roomCodeRef.current,
       theme: themeInput.trim()
     }));
 
     setThemeInput('');
+  };
+
+  const gameReady = () => {
+    // console.log("Sending QUESTION_READY with roomCode:", roomCodeRef.current);
+    socketRef.current?.send(JSON.stringify({
+      type: 'QUESTION_READY',
+      roomCode: roomCodeRef.current,
+    }));
   };
 
   return (
@@ -176,7 +214,7 @@ export default function MultiplayerTest() {
 
       {screen === 'theme' && (
         <div className="space-y-4">
-          <h1 className="text-xl font-bold">Submit the themes !</h1>
+          <h1 className="font-bold">You have {remainingTime} seconds to submit the themes !</h1>
           <canvas id="gameCanvas" className="mx-auto border w-full max-w-[800px] aspect-[4/3]"></canvas>
           <input
               value={themeInput}
@@ -188,9 +226,16 @@ export default function MultiplayerTest() {
             className="bg-green-600 text-white px-4 py-2 rounded"
             onClick={submitTheme}
           > Submit </button>
-          <div> current themes are {themes} </div>
         </div>
       )}
+
+      {screen === 'game' && (
+        <div className="space-y-4">
+          <h1 className="font-bold"> Game Time! Question based off of {usedTheme[0]} and {usedTheme[1]} !</h1>
+          <h1 className="font-bold"> Question {question} !</h1>
+        </div>
+      )}
+
     </div>
   );
 }

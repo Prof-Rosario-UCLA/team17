@@ -5,6 +5,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import Room from './roomModel.js';
 import User from './userModel.js';
+import OpenAI from 'openai';
 
 
 mongoose.connect('mongodb+srv://castropablo38:bG5cLUrJ24oTYENP@triv-ai.1lobcqx.mongodb.net/?retryWrites=true&w=majority&appName=Triv-ai');
@@ -18,6 +19,11 @@ app.use(express.json());
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+
+const openai = new OpenAI({ 
+  apiKey: "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",  //add this key to db
+  dangerouslyAllowBrowser: true,   //only keep this here while in development wil need to store key in backend soon
+});
 
 wss.on('connection', (ws) => {
   console.log('New client connected');
@@ -52,6 +58,7 @@ wss.on('connection', (ws) => {
           roomCode,
           players: [userId],
           themes: [],
+          ready: false,
           currentRound: 0,
           scores: {}
         });
@@ -124,6 +131,59 @@ wss.on('connection', (ws) => {
         break;
       }
 
+      case 'QUESTION_READY': {
+        const { roomCode } = msg;
+        // console.log("Received QUESTION_READY for:", roomCode);
+        const room = await Room.findOne({ roomCode });
+        if (!room) {
+          ws.send(JSON.stringify({ type: 'ERROR', message: 'Room not found' }));
+          return;
+        }
+        if(room.ready === false){
+          room.ready = true;
+          await room.save();
+          const theme = room.themes;
+          const selectedThemes = getTwoRandomThemes(theme);
+          let result = '';
+          try{
+            const response = await openai.chat.completions.create({
+              model: 'gpt-3.5-turbo',
+              temperature: 0.7,
+              messages: [
+                {
+                  role: 'user',
+                  content: `Return ONLY a valid JSON object in this exact format:
+                            {
+                              "question": "Your question here?",
+                              "choices": ["Correct Answer", "Wrong Answer 1", "Wrong Answer 2", "Wrong Answer 3"]
+                            }
+                            The question should creatively combine these two themes: "${selectedThemes[0]}" and "${selectedThemes[1]}".
+                            The question should be creative but **based on real, factual trivia** — nothing fictional or made-up and should be tailored for 10-30 year olds.
+                            The correct answer MUST be the first element in the "choices" array.
+                            Do not add any extra explanation or text — just return the raw JSON.`
+                }
+              ]
+            });
+            result = response.choices[0].message.content;
+          } catch (err) {
+            console.log('error (chat-gpt)')
+            result = 'Sorry, failed to generate a question.';
+          }
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
+              client.send(JSON.stringify({
+                type: 'QUESTION_SENT',
+                roomCode,
+                themes: selectedThemes,
+                result: result
+              }));
+            }
+          });
+        }
+
+        break;
+      }
+
     }
   });
 
@@ -155,13 +215,28 @@ async function broadcastReadyCount(wss, roomCode) {
       }
     });
   } else {
+    const startTime = Date.now() + 5000;
     wss.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
         client.send(JSON.stringify({
           type: 'THEME_READY',
           roomCode,
+          startTime,   
+          duration: 30000
         }));
       }
     });
   }
+}
+
+function getTwoRandomThemes(themes) {
+  if (themes.length < 1) return null;
+  if (themes.length < 2) return [themes[0],themes[0]];
+
+  const i = Math.floor(Math.random() * themes.length);
+  let j = Math.floor(Math.random() * themes.length);
+  while (j === i) {
+    j = Math.floor(Math.random() * themes.length);
+  } 
+  return [themes[i], themes[j]];
 }

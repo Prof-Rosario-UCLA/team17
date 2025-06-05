@@ -13,7 +13,7 @@ function getTwoRandomThemes(themes: string[]): [string, string] | null {
 
   const i = Math.floor(Math.random() * themes.length);
   let j = Math.floor(Math.random() * themes.length);
-  while (j === i); {
+  while (j === i) {
     j = Math.floor(Math.random() * themes.length);
   } 
   return [themes[i], themes[j]];
