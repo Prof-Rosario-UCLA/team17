@@ -7,42 +7,42 @@ import "./App.css";
 
 function App() {
   // states for the different modes of the SPA
-  const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game' | 'multiplayer'>('multiplayer'); // 👈 Starts on "auth"
+  // const [currentScreen, setCurrentScreen] = useState<'auth' | 'theme' | 'game' | 'multiplayer'>('multiplayer'); // 👈 Starts on "auth"
   
   // themes of the trivia questions
-  const [selectedTheme, setSelectedTheme] = useState('');
+  // const [selectedTheme, setSelectedTheme] = useState('');
 
   // variables for user information
-  const [user, setUser] = useState<any>(null);
+  // const [user, setUser] = useState<any>(null);
 
 
   // Load user from localStorage on app load
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setCurrentScreen('theme'); // Skip auth screen
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem('user');
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //     setCurrentScreen('lobby'); // Skip auth screen
+  //   }
+  // }, []);
 
   // Logout logic
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    setCurrentScreen('auth');
-  };
+  // const handleLogout = () => {
+  //   setUser(null);
+  //   localStorage.removeItem('user');
+  //   setCurrentScreen('auth');
+  // };
 
   // Login logic from AuthScreen
-  const handleLogin = (userInfo: any) => {
-    setUser(userInfo);
-    localStorage.setItem('user', JSON.stringify(userInfo));
-    setCurrentScreen('theme');
-  };
+  // const handleLogin = (userInfo: any) => {
+  //   setUser(userInfo);
+  //   localStorage.setItem('user', JSON.stringify(userInfo));
+  //   setCurrentScreen('theme');
+  // };
 
   return (
     <div className="h-screen flex flex-col items-center">
       {/* Top User Info Bar (always visible when user is logged in) */}
-      {user && (
+      {/* {user && (
         <div className="top-bar">
           <div className="user-info">
             <img src={user.picture} alt="User" className="w-[40px] h-[40px] rounded-full" />
@@ -55,32 +55,10 @@ function App() {
             Logout
           </button>
         </div>
-      )}
+      )} */}
 
-      {/* Dynamic Screen Content */}
       <div className="w-full max-w-3xl flex-grow flex items-center justify-center">
-        {currentScreen === 'auth' && (
-          <AuthScreen
-            onLogin={(userInfo) => {
-              setUser(userInfo);
-              setCurrentScreen('theme');
-            }}
-          />
-        )}
-        {currentScreen === 'theme' && (
-          <ThemeScreen
-            onThemeSelected={(theme) => {
-              setSelectedTheme(theme);
-              setCurrentScreen('game');
-            }}
-          />
-        )}
-        {currentScreen === 'game' && (
-          <GameScreen theme={selectedTheme} user={user} />
-        )}
-        {currentScreen === 'multiplayer' && (
-          <MultiplayerScreen />
-        )}
+        <MultiplayerScreen/>
       </div>
     </div>
   );

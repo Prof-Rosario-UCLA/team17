@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { addFloatingWord, initializeCanvas } from './ThemeCanvas';
+import AuthScreen from './AuthScreen';
 
 
 export default function MultiplayerTest() {
@@ -32,10 +33,31 @@ export default function MultiplayerTest() {
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:3001');
     socketRef.current = socket;
+    
+    const savedUser = localStorage.getItem("user");
+    const savedScreen = localStorage.getItem("screen");
 
-    socket.onopen = () => {
-      console.log('Connected to WebSocket server');
-    };
+    if (savedUser) {
+      const parsed = JSON.parse(savedUser);
+      setuserId(parsed.id);
+      setUserName(parsed.name);
+
+      socket.onopen = () => {
+        console.log('Connected to WebSocket server');
+
+        socket.send(JSON.stringify({
+          type: 'CREATE_USER',
+          userId: parsed.id,
+          userName: parsed.name,
+        }));
+
+        if (savedScreen) {
+          setScreen(savedScreen as any);
+        } else {
+          setScreen('lobby');
+        }
+      };
+    }
 
     socket.onmessage = (event) => {
       const msg = JSON.parse(event.data);
@@ -44,14 +66,17 @@ export default function MultiplayerTest() {
       switch (msg.type) {
         case 'USER_CONFIRMED':
           setScreen('lobby');
+          localStorage.setItem("screen", "lobby");
           break;
         case 'ROOM_CREATED':
           setRoomCode(msg.roomCode);
           setScreen('ready');
+          localStorage.setItem("screen", "ready");
           break;
         case 'ROOM_JOINED':
           setRoomCode(msg.roomCode);
           setScreen('ready');
+          localStorage.setItem("screen", "ready");
           break;
         case 'USER_JOINED':
           break;
@@ -63,11 +88,13 @@ export default function MultiplayerTest() {
           const endTime = msg.startTime + msg.duration;
           const interval = setInterval(() => {
             setScreen('theme');
+            localStorage.setItem("screen", "theme");
             const remaining = endTime - Date.now();
             if (remaining <= 0) {
               clearInterval(interval);
               setRemainingTime(0);
               setScreen('game');
+              localStorage.setItem("screen", "game");
               gameReady();
             } else {
               setRemainingTime(Math.ceil(remaining / 1000));
@@ -153,24 +180,66 @@ export default function MultiplayerTest() {
   };
 
   return (
-    <div className="text-center space-y-6 p-6">
+    <div className="text-center space-y-6 p-6 ">
+      {/* Top User Info Bar (always visible when user is logged in) */}
+      {userName && (
+        <div className="top-bar">
+          <div className="user-info">
+            <img 
+              src={JSON.parse(localStorage.getItem("user") || "{}").picture} 
+              alt="User" 
+              className="w-[40px] h-[40px] rounded-full" />
+            <span className="text-lg font-semibold">{userName}</span>
+          </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("user");
+              localStorage.removeItem("screen");
+              window.location.reload(); 
+            }}
+            className="logout-button"
+          >
+            Logout
+          </button>
+        </div>
+      )}
       <h1 className="text-2xl font-bold">Triv.ai</h1>
 
       {screen === 'auth' && (
-        <div>
-          <input
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="Enter your name"
-            className="border p-2 mr-2"
-          />
-          <button
-            className="bg-indigo-600 text-white px-4 py-2 rounded"
-            onClick={handleCreateUser}
-          >
-            Create User
-          </button>
-        </div>
+        // <div>
+        //   <input
+        //     value={userName}
+        //     onChange={(e) => setUserName(e.target.value)}
+        //     placeholder="Enter your name"
+        //     className="border p-2 mr-2"
+        //   />
+        //   <button
+        //     className="bg-indigo-600 text-white px-4 py-2 rounded"
+        //     onClick={handleCreateUser}
+        //   >
+        //     Create User
+        //   </button>
+        // </div>
+        <AuthScreen
+          onLogin={(user: any) => {
+            const id = crypto.randomUUID();
+            setuserId(id);
+            setUserName(user.name);
+
+            localStorage.setItem("screen", "lobby");
+            localStorage.setItem("user", JSON.stringify({ id, name: user.name, picture: user.picture }));
+
+            // Notify server
+            socketRef.current?.send(JSON.stringify({
+              type: 'CREATE_USER',
+              userId: id,
+              userName: user.name,
+            }));
+
+            setScreen('lobby');
+            localStorage.setItem("screen", "lobby");
+          }}
+        />
       )}
 
       {screen === 'lobby' && (
@@ -202,7 +271,7 @@ export default function MultiplayerTest() {
 
       {screen === 'ready' && (
         <div className="space-y-4">
-          <h1 className="text-xl font-bold">Welcome to room: {roomCode} !</h1>
+          <h1 className="text-xl font-bold">Welcome to room: {roomCode}</h1>
           <div> Once all players have joined press the ready button </div>
           <button
             className="bg-green-600 text-white px-4 py-2 rounded"
