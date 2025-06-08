@@ -185,7 +185,7 @@ wss.on('connection', (ws) => {
                 question: result.question,
                 answer: result.choices,
                 startTime, 
-                duration: 20000
+                duration: 10000
               }));
             }
           });
@@ -223,9 +223,9 @@ wss.on('connection', (ws) => {
             points: user.points,
           };
         });
-        console.log('About to send CORRECT_ANSWER:', room.correctAnswer);
+        //console.log('About to send CORRECT_ANSWER:', room.correctAnswer);
 
-        const startTime = Date.now() + 5000;
+        const startTime = Date.now() + 2500;
           wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
               client.send(JSON.stringify({
@@ -234,7 +234,7 @@ wss.on('connection', (ws) => {
                 correctAnswer: room.correctAnswer,
                 scores,
                 startTime, 
-                duration: 20000
+                duration: 2500
               }));
             }
           });
