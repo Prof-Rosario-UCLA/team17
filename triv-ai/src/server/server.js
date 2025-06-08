@@ -8,6 +8,7 @@ import User from './userModel.js';
 import OpenAI from 'openai';
 
 
+
 mongoose.connect('mongodb+srv://castropablo38:bG5cLUrJ24oTYENP@triv-ai.1lobcqx.mongodb.net/?retryWrites=true&w=majority&appName=Triv-ai');
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
@@ -76,6 +77,8 @@ wss.on('connection', (ws) => {
 
         if (room) {
           room.players.push(userId);
+          const score = room.scores.get(userId) || 0;
+          room.scores.set(userId, score);
           await room.save();
           const playersInRoom = await User.find({ _id: { $in: room.players } });
           const playerReady = playersInRoom.filter(p => p.ready).length;
@@ -166,10 +169,13 @@ wss.on('connection', (ws) => {
               ]
             });
             result = JSON.parse(response.choices[0].message.content);
+            room.correctAnswer = result.choices[0];
+            await room.save();
           } catch (err) {
             console.log('error (chat-gpt)')
             result = 'Sorry, failed to generate a question.';
           }
+          const startTime = Date.now() + 5000;
           wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
               client.send(JSON.stringify({
@@ -177,12 +183,61 @@ wss.on('connection', (ws) => {
                 roomCode,
                 themes: selectedThemes,
                 question: result.question,
-                answer: result.choices
+                answer: result.choices,
+                startTime, 
+                duration: 20000
               }));
             }
           });
         }
 
+        break;
+      }
+
+      case 'ANSWER_SUBMISSION': {
+        const { roomCode, userId, answer} = msg;
+        const room = await Room.findOne({ roomCode });
+        const scores = {};
+        ws.roomCode = roomCode; 
+        if (!room) {
+          ws.send(JSON.stringify({ type: 'ERROR', message: 'Room not found' }));
+          return;
+        }
+        if(answer === room.correctAnswer){
+          const currentScore = room.scores.get(userId) || 0;
+          const newScore = currentScore + 10;
+          room.scores.set(userId, newScore);
+          const user = await User.findOne({ _id: userId });
+          if (user) {
+            user.points = newScore;
+            await user.save();
+          }
+        }
+        room.ready = false;
+        await room.save();
+
+        const users = await User.find({ _id: { $in: room.players } });
+        users.forEach(user => {
+          scores[user._id] = {
+            name: user.name,
+            points: user.points,
+          };
+        });
+        console.log('About to send CORRECT_ANSWER:', room.correctAnswer);
+
+        const startTime = Date.now() + 5000;
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client.roomCode === roomCode) {
+              client.send(JSON.stringify({
+                type: 'CORRECT_ANSWER',
+                roomCode,
+                correctAnswer: room.correctAnswer,
+                scores,
+                startTime, 
+                duration: 20000
+              }));
+            }
+          });
         break;
       }
 

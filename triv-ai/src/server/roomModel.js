@@ -7,6 +7,7 @@ const RoomSchema = new mongoose.Schema({
   ready: Boolean,
   currentRound: Number,
   scores: { type: Map, of: Number },
+  correctAnswer: { type: String, default: null, },
 });
 
 const Room = mongoose.model('Room', RoomSchema);

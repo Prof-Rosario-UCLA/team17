@@ -6,6 +6,8 @@ export default function MultiplayerTest() {
   const socketRef = useRef<WebSocket | null>(null);
   const roomCodeRef = useRef<string | null>(null);
   const userIdRef = useRef<string | null>(null);
+  const selectedAnswerRef = useRef('');
+
 
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [userId, setuserId] = useState<string | null>(null);
@@ -15,12 +17,22 @@ export default function MultiplayerTest() {
   const [status, setStatus] = useState('');
   const [themeInput, setThemeInput] = useState('');
   const [userName, setUserName] = useState('');
-  const [themes, setThemes] = useState(['']);
-  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game'>('auth');
+  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game' | 'scores'>('auth');
   const [remainingTime, setRemainingTime] = useState<number>(30);
+  const [remainingTime1, setRemainingTime1] = useState<number>(30);
+  const [remainingTime2, setRemainingTime2] = useState<number>(30); 
+  const themeIntervalRef = useRef<number | null>(null);
+  const gameIntervalRef = useRef<number | null>(null);
+  const scoreIntervalRef = useRef<number | null>(null);
+
   const [usedTheme, setUsedTheme] = useState(['']);
   const [question, setQuestion] = useState('');
-  const [answers, setAnswers] = useState(['']);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [scores, setScores] = useState<{ [userId: string]: { name: string, points: number } }>({});
+
+
+
 
   useEffect(() => {
     roomCodeRef.current = roomCode;
@@ -28,6 +40,9 @@ export default function MultiplayerTest() {
   useEffect(() => {
     userIdRef.current = userId;
   }, [userId]);
+  useEffect(() => {
+    selectedAnswerRef.current = selectedAnswer;
+  }, [selectedAnswer]);
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:3001');
@@ -60,17 +75,18 @@ export default function MultiplayerTest() {
           setplayersReady(msg.playerReady);
           break;
         case 'THEME_READY':
-          const endTime = msg.startTime + msg.duration;
-          const interval = setInterval(() => {
+          const endTime1 = msg.startTime + msg.duration;
+          if (themeIntervalRef.current !== null) clearInterval(themeIntervalRef.current);
+          themeIntervalRef.current = setInterval(() => {
             setScreen('theme');
-            const remaining = endTime - Date.now();
+            let remaining = endTime1 - Date.now();
             if (remaining <= 0) {
-              clearInterval(interval);
+              clearInterval(themeIntervalRef.current!);
               setRemainingTime(0);
-              setScreen('game');
+              
               gameReady();
             } else {
-              setRemainingTime(Math.ceil(remaining / 1000));
+              setRemainingTime(Math.floor(remaining / 1000));
             }
           }, 100);
 
@@ -82,6 +98,39 @@ export default function MultiplayerTest() {
           if(msg.themes) setUsedTheme(msg.themes);
           if(msg.question) setQuestion(msg.question);
           if(msg.answer) setAnswers(msg.answer);
+          setScreen('game');
+          const endTime2 = msg.startTime + msg.duration;
+          
+          if (gameIntervalRef.current !== null) clearInterval(gameIntervalRef.current);
+          gameIntervalRef.current = setInterval(() => {
+            const remaining = endTime2 - Date.now();
+            if (remaining <= 0) {
+              clearInterval(gameIntervalRef.current!);
+              setRemainingTime1(0);
+              answerSent();
+            } else {
+              setRemainingTime1(Math.floor(remaining / 1000));
+            }
+          }, 100);
+
+          break;
+        case 'CORRECT_ANSWER':
+          if(msg.correctAnswer) setSelectedAnswer(msg.correctAnswer);
+          if(msg.scores) setScores(msg.scores);
+          setScreen('scores');
+          const endTime3 = msg.startTime + msg.duration;
+          if (scoreIntervalRef.current !== null) clearInterval(scoreIntervalRef.current);
+          scoreIntervalRef.current = setInterval(() => {
+            const remaining = endTime3 - Date.now();
+            if (remaining <= 0) {
+              clearInterval(scoreIntervalRef.current!);
+              setRemainingTime2(0);
+              gameReady();
+            } else {
+              setRemainingTime2(Math.floor(remaining / 1000));
+            }
+          }, 100);
+
           break;
         case 'ERROR':
           setStatus(`Error: ${msg.message}`);
@@ -89,8 +138,13 @@ export default function MultiplayerTest() {
       }
     };
 
-    return () => socketRef.current?.close();
-  }, []);
+    return () => {
+    socketRef.current?.close();
+    if (themeIntervalRef.current !== null) clearInterval(themeIntervalRef.current);
+    if (gameIntervalRef.current !== null) clearInterval(gameIntervalRef.current);
+    if (scoreIntervalRef.current !== null) clearInterval(scoreIntervalRef.current);
+  };
+}, []);
 
   useEffect(() => {
     if (screen === 'theme') {
@@ -149,6 +203,16 @@ export default function MultiplayerTest() {
     socketRef.current?.send(JSON.stringify({
       type: 'QUESTION_READY',
       roomCode: roomCodeRef.current,
+    }));
+  };
+
+  const answerSent = () => {
+    // console.log("Sending QUESTION_READY with roomCode:", roomCodeRef.current);
+    socketRef.current?.send(JSON.stringify({
+      type: 'ANSWER_SUBMISSION',
+      roomCode: roomCodeRef.current,
+      userId: userIdRef.current,
+      answer: selectedAnswerRef.current
     }));
   };
 
@@ -233,12 +297,46 @@ export default function MultiplayerTest() {
 
       {screen === 'game' && (
         <div className="space-y-4">
-          <h1 className="font-bold"> Game Time! Question based off of {usedTheme[0]} and {usedTheme[1]} !</h1>
+          <h1 className="font-bold"> Game Time! {remainingTime1} Question based off of {usedTheme[0]} and {usedTheme[1]} !</h1>
           <div> Question {question} !</div>
-          <button>{answers[0]}</button>
-          <button>{answers[1]}</button>
-          <button>{answers[2]}</button>
-          <button>{answers[3]}</button>
+          <button
+              onClick={() => setSelectedAnswer(answers[0])}
+              className={`px-4 py-2 border rounded `}
+            >
+              {answers[0]}
+          </button>
+          <button
+              onClick={() => setSelectedAnswer(answers[1])}
+              className={`px-4 py-2 border rounded `}
+            >
+              {answers[1]}
+          </button>
+          <button
+              onClick={() => setSelectedAnswer(answers[2])}
+              className={`px-4 py-2 border rounded `}
+            >
+              {answers[2]}
+          </button>
+          <button
+              onClick={() => setSelectedAnswer(answers[3])}
+              className={`px-4 py-2 border rounded `}
+            >
+              {answers[3]}
+          </button>
+        </div>
+      )}
+
+      {screen === 'scores' && (
+        <div className="space-y-4">
+          <h1 className="font-bold">{remainingTime2} seconds to next round !</h1>
+          <h2 className="text-lg font-semibold">Current Scores:</h2>
+          <ul className="text-left inline-block">
+            {Object.entries(scores).map(([userId, data]) => (
+              <li key={userId}>
+                <strong>{data.name}</strong>: {data.points} points
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
