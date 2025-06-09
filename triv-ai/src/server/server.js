@@ -44,6 +44,10 @@ wss.on('connection', (ws) => {
           const newUser = new User({ _id: userId, name: userName, ready: false });
           await newUser.save();
           console.log(`Created user: ${userName} (${userId})`);
+        } else {
+          existing.ready = false;
+          existing.points = 0;
+          await existing.save();
         }
         ws.send(JSON.stringify({ type: 'USER_CONFIRMED', userId }));
         break;

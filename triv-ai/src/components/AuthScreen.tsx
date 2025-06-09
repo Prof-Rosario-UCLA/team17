@@ -30,7 +30,13 @@ export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }
                     onSuccess={(credentialResponse) => {
                         const credential = credentialResponse.credential;
                         if (credential) {
-                            const userInfo: any = jwtDecode(credential);
+                            const decoded: any = jwtDecode(credential);
+                            const userInfo = {
+                                id: decoded.sub,             // 🔐 Stable Google user ID
+                                name: decoded.name,
+                                picture: decoded.picture,
+                                email: decoded.email,        // optional but useful
+                            };
                             setUser(userInfo);
                             localStorage.setItem("user", JSON.stringify(userInfo));
                             onLogin(userInfo);

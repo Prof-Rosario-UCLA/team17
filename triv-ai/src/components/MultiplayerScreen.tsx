@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { addFloatingWord, initializeCanvas } from './ThemeCanvas';
 import AuthScreen from './AuthScreen';
+import ThemeScreen from './ThemeScreen';
 
 
 export default function MultiplayerTest() {
@@ -18,7 +19,7 @@ export default function MultiplayerTest() {
   const [status, setStatus] = useState('');
   const [themeInput, setThemeInput] = useState('');
   const [userName, setUserName] = useState('');
-  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game' | 'scores'>('auth');
+  const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game' | 'scores' | 'local'| 'pass-n-play'>('auth');
   const [remainingTime, setRemainingTime] = useState<number>(30);
   const [remainingTime1, setRemainingTime1] = useState<number>(30);
   const [remainingTime2, setRemainingTime2] = useState<number>(30); 
@@ -80,8 +81,8 @@ export default function MultiplayerTest() {
 
       switch (msg.type) {
         case 'USER_CONFIRMED':
-          setScreen('lobby');
-          localStorage.setItem("screen", "lobby");
+          setScreen('local');
+          localStorage.setItem("screen", "local");
           break;
         case 'ROOM_CREATED':
           setRoomCode(msg.roomCode);
@@ -243,9 +244,16 @@ export default function MultiplayerTest() {
     }));
   };
 
+  const multiplayer = () => {
+      setScreen('lobby');
+      localStorage.setItem("screen", "lobby");
+  };
+
+
   return (
     <div className="text-center space-y-6 p-6 ">
       {/* Top User Info Bar (always visible when user is logged in) */}
+      
       {userName && (
         <div className="top-bar">
           <div className="user-info">
@@ -286,12 +294,11 @@ export default function MultiplayerTest() {
         // </div>
         <AuthScreen
           onLogin={(user: any) => {
-            const id = crypto.randomUUID();
+            const id = user.id;
             setuserId(id);
             setUserName(user.name);
 
-            localStorage.setItem("screen", "lobby");
-            localStorage.setItem("user", JSON.stringify({ id, name: user.name, picture: user.picture }));
+            localStorage.setItem("user", JSON.stringify(user));
 
             // Notify server
             socketRef.current?.send(JSON.stringify({
@@ -300,10 +307,31 @@ export default function MultiplayerTest() {
               userName: user.name,
             }));
 
-            setScreen('lobby');
-            localStorage.setItem("screen", "lobby");
+            setScreen('local');
+            localStorage.setItem("screen", "local");
           }}
         />
+      )}
+
+      {screen === 'local' && (
+        <div>
+        <header>menu</header>
+        <button
+        className="bg-green-600 text-white px-4 py-2 rounded"
+        onClick={() => setScreen('pass-n-play')}
+        > local play</button>
+        <button 
+        className="bg-green-600 text-white px-4 py-2 rounded"
+        onClick={multiplayer}> multiplayer </button>
+        </div>
+        
+      )}
+
+      {screen === 'pass-n-play' && (
+        <ThemeScreen onThemeSelected={(themes: string[]) => {
+          console.log('Selected themes:', themes);
+          // You can store or send these themes however you'd like
+        }} />
       )}
 
       {screen === 'lobby' && (
