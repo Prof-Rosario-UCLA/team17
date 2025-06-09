@@ -76,7 +76,15 @@
   font-family: inherit;
   outline: none;
 }
-
+.progress-bar2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #3b82f6; 
+    width: 100%; 
+    animation: progress-bar 15s linear forwards;
+}
 
 @keyframes progress-bar {
   0% {

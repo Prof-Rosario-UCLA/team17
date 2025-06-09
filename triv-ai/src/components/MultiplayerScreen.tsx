@@ -34,8 +34,6 @@ export default function MultiplayerTest() {
   const [scores, setScores] = useState<{ [userId: string]: { name: string, points: number } }>({});
 
 
-
-
   useEffect(() => {
     roomCodeRef.current = roomCode;
   }, [roomCode]);
