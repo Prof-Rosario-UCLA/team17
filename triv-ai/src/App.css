@@ -154,6 +154,16 @@
   max-width: 500px;
   line-height: 1.5;
 }
+.subtext-compact {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #1f2937;
+  text-align: center;
+  max-width: 500px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
 
 .answer-grid {
   display: grid;
@@ -254,6 +264,12 @@
   }
   .input-field {
     font-size: 1.1rem;
+  }
+
+  .player-name-inputs {
+    max-height: 20rem; /* adjust as needed */
+    overflow-y: auto;
+    width: 60%;
   }
 }
 

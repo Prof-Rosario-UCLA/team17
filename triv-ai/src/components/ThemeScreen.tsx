@@ -175,10 +175,14 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
         <div className="theme-screen">
             {screen === 'setup' && (
                 <div className="setup-screen">
-                <h1>Pass & Play Setup</h1>
-                <label className="setup-screen-label">
-                    Number of players:
+                <h1 className='welcome-heading'>Who's Playing?</h1>
+                <div className='subtext'>
+                Set how many players are joining in and tell us their names!
+                </div>
+                <label className="subtext">
+                    Number of players : 
                     <input
+                    className='input-field'
                     type="number"
                     min={1}
                     max={10}
@@ -193,22 +197,23 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
                     {Array.from({ length: numberOfPlayers }, (_, i) => (
                     <div key={i}>
                         <input
-                        placeholder={`Player ${i + 1} name`}
+                        className='input-field'
+                        placeholder={`Enter name for Player ${i + 1}`}
                         value={playerNames[i] || ''}
                         onChange={(e) => updatePlayerName(i, e.target.value)}
                         />
                     </div>
                     ))}
                 </div>
-                <button onClick={handleSetupSubmit}>Start Theme Entry</button>
+                <button className='menu-button2' onClick={handleSetupSubmit}>Start the Theme Challenge</button>
                 </div>
             )}
 
             {screen === 'theme' && (
             isReadyScreen ? (
                 <div className="ready-screen">
-                <h1>Player {playerNames[playerIndex]}'s Turn!</h1>
-                <h2>You have 30 seconds to enter themes.</h2>
+                <h1>It's {playerNames[playerIndex]}'s Turn!</h1>
+                <h2>Rapid fire: Enter as many fun themes as you can in 30 seconds!</h2>
                 <button className="ready-button" onClick={startPlayerTurn}>
                     Start
                 </button>
@@ -218,18 +223,21 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
                 <header className="theme-header">
                     <div className="progress-bar"/> 
                 </header>
+                <div className='theme-container'>
+                
                 <div className='theme-wrapper'>
-                    <h2 className="text-xl mb-2">Player {playerNames[playerIndex]}, pick your theme</h2>
-                    <canvas id="gameCanvas" className="theme-canvas"></canvas>
+                    <h2 className="welcome-heading"><span className='username'>{playerNames[playerIndex]}</span>, pick your themes!</h2>
+                    <canvas id="gameCanvas" className="canvas-box"></canvas>
                     <div>
                     <input
                         value={themeInput}
                         onChange={(e) => setThemeInput(e.target.value)}
-                        className="input-box"
+                        className="input-field"
                         placeholder="e.g. Space, History, Disney"
                     />
-                    <button onClick={submitTheme}>Submit</button>
+                    <button className='menu-button2' onClick={submitTheme}>Submit</button>
                     </div>
+                </div>
                 </div>
                 </div>
             )
@@ -237,47 +245,53 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
 
             {screen === 'game' && (
             <div>
-                <header className="theme-header">
+                <header className="theme-header2">
                     <div className="progress-bar2"/> 
                 </header>
-                <h2>{playerNames[gamePlayerIndex]}'s turn to answer!</h2>
-                <h1>{question}</h1>
-                <button onClick={() => setSelectedAnswer(answers[0])} >{answers[0]}</button>
-                <button onClick={() => setSelectedAnswer(answers[1])} >{answers[1]}</button>
-                <button onClick={() => setSelectedAnswer(answers[2])} >{answers[2]}</button>
-                <button onClick={() => setSelectedAnswer(answers[3])} >{answers[3]}</button>
+                <div className='theme-wrapper'>
+                <h2 className="welcome-heading" ><span className='username'>{playerNames[gamePlayerIndex]}</span>'s turn to answer!</h2>
+                <h1 className='question-text'>{question}</h1>
+                <div className="answer-grid">
+                    <button className='answer-button' onClick={() => setSelectedAnswer(answers[0])} >{answers[0]}</button>
+                    <button className='answer-button' onClick={() => setSelectedAnswer(answers[1])} >{answers[1]}</button>
+                    <button className='answer-button' onClick={() => setSelectedAnswer(answers[2])} >{answers[2]}</button>
+                    <button className='answer-button' onClick={() => setSelectedAnswer(answers[3])} >{answers[3]}</button>
+                </div>
+                </div>
             </div>
             )}
 
             {screen === 'correct' && (
-            <div>
+            <div className="ready-screen">
                 <h1>The correct answer was {correctAnswer}</h1>
             </div>
             )}
 
             {screen === 'scores' && (
-            <div>
-                <h1>Round {round - 1}'s Score Screen</h1>
+            <div className='theme-wrapper2'>
+                <h1 className='welcome-heading'>Round <span className='username'>{round - 1}</span>'s Score Screen</h1>
                 {playerNames.map((name, i) => (
-                <p key={i}>{name}: {scores[i]} point{scores[i] !== 1 ? 's' : ''}</p>
+                <p className='subtext' key={i}>{name}: {scores[i]} points</p>
                 ))}
-                <button onClick={() => scoresRound()}>Next Round</button>
+                <button className='menu-button2' onClick={() => scoresRound()}>Next Round</button>
             </div>
             )}
 
             {screen === 'end' && (
-            <div>
-                <h1>Thats the end of the Game here are the scores</h1>
-                {playerNames.map((name, i) => (
-                <p key={i}>{name}: {scores[i]} points</p>
-                ))}
-                <h1>Overall LeaderBoard: Your top 5 runs !</h1>
+            <div className='theme-wrapper2'>
+                <h1 className='welcome-heading'>That’s a wrap! <span className="username">Here are your scores:</span></h1>
+                <div className='theme-wrapper3'>
+                    {playerNames.map((name, i) => (
+                    <p className='subtext' key={i}> <strong>{name}</strong>: {scores[i]} points</p>
+                    ))}
+                </div>
+                <h1 className='welcome-heading'>All-Time Leaderboard — <span className="username">Top 5 High Scores</span></h1>
                 {topScores.map((entry, i) => (
-                    <p key={i}>
-                    {i + 1}. {entry.name} — {entry.score} point{entry.score !== 1 ? 's' : ''}
+                    <p className='subtext' key={i}>
+                    <strong>{i + 1}. {entry.name}</strong> — {entry.score} point{entry.score !== 1 ? 's' : ''}
                     </p>
                 ))}
-                <button onClick={onExit}>Go Home</button>
+                <button className='menu-button2' onClick={onExit}>Go Home</button>
             </div>
             )}
         </div>

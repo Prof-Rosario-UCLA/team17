@@ -11,12 +11,11 @@ html, body {
 .setup-screen {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100vh; 
-  width: 100vw;
+  align-items: center;  
+  min-height: 100vh;  
   padding: 1rem;
-  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .setup-screen-label {
@@ -34,14 +33,6 @@ html, body {
   margin-bottom: 1.5rem;
 }
 
-.player-name-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  width: 100%;
-  max-width: 300px;
-}
 
 .setup-screen button {
   background-color: #3b82f6;
@@ -101,17 +92,32 @@ html, body {
   margin: 0; 
   line-height: 1.2; 
 }
+
 .theme-header {
-    height: 15px;
-    background-color: #e5e7eb;
-    position: fixed;
-    top: 120px;                        /* pushing progress bar below the user info bar */
-    left: 50%;                        /* Center horizontally */
-    transform: translateX(-50%);      /* Offset half the width */
-    width: 90vw;
-    overflow: hidden;
-    z-index: 999;
-    border-radius: 4px; /* optional, for nicer edges */
+  position: relative;
+  top: 0;
+  width: 100%;
+  height: 15px;
+  border-radius: 4px;
+  background-color: transparent;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rem;
+}
+.theme-header2 {
+  position: relative;
+  top: 0;
+  width: 100%;
+  height: 15px;
+  border-radius: 4px;
+  background-color: transparent;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0rem;
 }
 .progress-bar {
     position: absolute;
@@ -128,6 +134,21 @@ html, body {
   align-items: center;
   gap: 1rem; /* spacing between canvas, input, and button */
   padding: 1rem;
+}
+.theme-wrapper2{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.theme-wrapper3 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
 }
 .theme-canvas {
   width: 100%;
