@@ -173,11 +173,10 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
 
     return (
         <div className="theme-screen">
-
             {screen === 'setup' && (
                 <div className="setup-screen">
                 <h1>Pass & Play Setup</h1>
-                <label>
+                <label className="setup-screen-label">
                     Number of players:
                     <input
                     type="number"

@@ -258,6 +258,7 @@ export default function MultiplayerTest() {
               className="w-[40px] h-[40px] rounded-full" />
             <span className="text-lg font-semibold">{userName}</span>
           </div>
+          <div>
           <button
             onClick={() => {
               localStorage.removeItem("user");
@@ -268,9 +269,17 @@ export default function MultiplayerTest() {
           >
             Logout
           </button>
+          <button
+            onClick={() => {
+              setScreen('local');
+            }}
+            className="logout-button"
+          >
+            Home
+          </button>
+          </div>
         </div>
       )}
-      <h1 className="text-2xl font-bold">Triv.ai</h1>
 
       {!isOnline && (
         <div className="offline-banner">
@@ -315,17 +324,16 @@ export default function MultiplayerTest() {
       )}
 
       {screen === 'local' && (
-        <div>
-        <header>menu</header>
-        <button
-        className="bg-green-600 text-white px-4 py-2 rounded"
-        onClick={() => setScreen('pass-n-play')}
-        > local play</button>
-        <button 
-        className="bg-green-600 text-white px-4 py-2 rounded"
-        onClick={multiplayer}> multiplayer </button>
+        <div className="flex flex-col items-center justify-center text-center space-y-4">
+        <h1 className='welcome-heading'> Triv<span className='username'>.ai</span> </h1>
+          <button
+          className="menu-button"
+          onClick={() => setScreen('pass-n-play')}
+          > Local Play</button>
+          <button 
+          className="menu-button"
+          onClick={multiplayer}> Multiplayer </button>
         </div>
-        
       )}
       
       {screen === 'pass-n-play' && (
@@ -339,98 +347,95 @@ export default function MultiplayerTest() {
 
       {screen === 'lobby' && (
         <div className="space-y-4">
-          <h1 className="text-xl font-bold">Welcome {userName} !</h1>
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded"
-            onClick={createRoom}
-          >
-            Create Room
-          </button>
-
-          <div>
-            <input
-              value={joinCodeInput}
-              onChange={(e) => setJoinCodeInput(e.target.value)}
-              placeholder="Enter room code"
-              className="border p-2 mr-2"
-            />
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={joinRoom}
-            >
-              Join Room
-            </button>
+          <h1 className="welcome-heading">
+            Welcome <span className="username">{userName}</span>!
+          </h1>
+          <div className="flex flex-col items-center gap-4 mt-8">
+            <button className="menu-button2" onClick={createRoom} >Create Room</button>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter room code"
+                className="input-field"
+                onChange={(e) => setJoinCodeInput(e.target.value)}
+              />
+              <button className="menu-button2" onClick={joinRoom}>Join Room</button>
+            </div>
           </div>
         </div>
       )}
 
       {screen === 'ready' && (
-        <div className="space-y-4">
-          <h1 className="text-xl font-bold">Welcome to room: {roomCode}</h1>
-          <div> Once all players have joined press the ready button </div>
+        <div className="flex flex-col items-center justify-center text-center space-y-4">
+          <h1 className="welcome-heading">You're In! Room Code: <span className='username'>{roomCode}</span></h1>
+          <div className='subtext'> Invite your friends using the code above. Once everyone’s in, hit <strong>Ready!</strong> to start the fun! </div>
           <button
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="menu-button2"
             onClick={playerReady}
           >
             Ready!
           </button>
-          <div> {playersReady} out of {numberPlayers} players have readied up</div>
+          <div className='subtext' > {playersReady} / {numberPlayers} players are ready to play!</div>
         </div>
       )}
 
       {screen === 'theme' && (
-        <div className="space-y-4">
-          <h1 className="font-bold">You have {remainingTime} seconds to submit the themes !</h1>
-          <canvas id="gameCanvas" className="mx-auto border w-full max-w-[800px] aspect-[4/3]"></canvas>
-          <input
-              value={themeInput}
-              onChange={(e) => setThemeInput(e.target.value)}
-              placeholder="e.g. Space, History, Disney"
-              className="border p-2"
-          />
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded"
-            onClick={submitTheme}
-          > Submit </button>
+        <div className="theme-container">
+          <h1 className="welcome-heading">You have <span className='username'>{remainingTime}</span> seconds to submit the themes !</h1>
+          <canvas id="gameCanvas" className="canvas-box"></canvas>
+          <div className='theme-input-group'>
+            <input
+                value={themeInput}
+                onChange={(e) => setThemeInput(e.target.value)}
+                placeholder="e.g. Space, History, Disney"
+                className="input-field"
+            />
+            <button
+              className="menu-button2"
+              onClick={submitTheme}
+            > Submit </button>
+          </div>
         </div>
       )}
 
       {screen === 'game' && (
-        <div className="space-y-4">
-          <h1 className="font-bold"> Game Time! {remainingTime1} Question based off of {usedTheme[0]} and {usedTheme[1]} !</h1>
-          <div> Question {question} !</div>
+        <div className="flex flex-col items-center justify-center px-4 py-6 space-y-6">
+          <h1 className="welcome-heading"> Game Time! <span className='username'>{remainingTime1} </span> seconds left!</h1>
+          <div className='question-text'>{question}</div>
+          <div className="answer-grid">
           <button
               onClick={() => setSelectedAnswer(answers[0])}
-              className={`px-4 py-2 border rounded `}
+              className={`answer-button ${selectedAnswerRef.current === answers[0] ? 'selected' : ''}`}
             >
               {answers[0]}
           </button>
           <button
               onClick={() => setSelectedAnswer(answers[1])}
-              className={`px-4 py-2 border rounded `}
+              className={`answer-button ${selectedAnswerRef.current === answers[1] ? 'selected' : ''}`}
             >
               {answers[1]}
           </button>
           <button
               onClick={() => setSelectedAnswer(answers[2])}
-              className={`px-4 py-2 border rounded `}
+              className={`answer-button ${selectedAnswerRef.current === answers[2] ? 'selected' : ''}`}
             >
               {answers[2]}
           </button>
           <button
               onClick={() => setSelectedAnswer(answers[3])}
-              className={`px-4 py-2 border rounded `}
+              className={`answer-button ${selectedAnswerRef.current === answers[3] ? 'selected' : ''}`}
             >
               {answers[3]}
           </button>
+          </div>
         </div>
       )}
 
       {screen === 'scores' && (
         <div className="space-y-4">
-          <h1 className="font-bold">{remainingTime2} seconds to next round !</h1>
-          <h2 className="text-lg font-semibold">Current Scores:</h2>
-          <ul className="text-left inline-block">
+          <h1 className="welcome-heading">{remainingTime2} seconds to next round !</h1>
+          <h2 className="subtext">Current Scores:</h2>
+          <ul className="subtext">
             {Object.entries(scores).map(([userId, data]) => (
               <li key={userId}>
                 <strong>{data.name}</strong>: {data.points} points

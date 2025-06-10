@@ -41,7 +41,8 @@ export default defineConfig({
     
   ],
   server: {
-    https: true
+    https: false,  // ✅ Revert to HTTP
+    port: 5173,     // optional, use your preferred port
   },
   define: {
     'process.env': {}
