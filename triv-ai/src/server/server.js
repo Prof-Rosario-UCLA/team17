@@ -301,3 +301,43 @@ function getTwoRandomThemes(themes) {
   } 
   return [themes[i], themes[j]];
 }
+
+
+app.post('/leaderboard/local/:userId', async (req, res) => {
+  const { entries } = req.body; 
+  const userId = req.params.userId;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).send('User not found');
+
+    const combined = [...user.localLeaderBoard, ...entries]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5); 
+
+    user.localLeaderBoard = combined;
+    await user.save();
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to update leaderboard');
+  }
+});
+
+
+app.get('/leaderboard/top/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).send('User not found');
+
+    const top = user.localLeaderBoard
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    res.json(top);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to fetch leaderboard');
+  }
+});

@@ -3,8 +3,10 @@ import './ThemeScreen.css';
 import { initializeCanvas, addFloatingWord } from './ThemeCanvas';
 import { generateQuestionAndAnswers } from './GameScreen';
 
-export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (theme: string[]) => void }) {
-    const [screen, setScreen] = useState<'setup' | 'theme' | 'game' | 'scores' | 'correct'>('setup');
+export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThemeSelected: (theme: string[]) => void; onExit: () => void; userId: string | null;}) {
+    const [screen, setScreen] = useState<'setup' | 'theme' | 'game' | 'scores' | 'correct'| 'end'>('setup');
+    const [round, setRound] = useState(1);
+    const totalRounds = 3;
 
     const [allThemes, setAllThemes] = useState<string[]>([]);
     const [themeInput, setThemeInput] = useState('');
@@ -21,7 +23,15 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
     const [selectedAnswer, setSelectedAnswer] = useState('');
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [isQuestionLoading, setIsQuestionLoading] = useState(false);
+    const [topScores, setTopScores] = useState<{ name: string; score: number }[]>([]);
 
+
+    useEffect(() => {
+        if (screen === 'end' && userId) {
+            sendScoresToDB();
+            getLeaderBoard();
+        }
+    }, [screen, userId]);
 
    useEffect(() => {
         setPlayerNames(Array(numberOfPlayers).fill(''));
@@ -74,7 +84,13 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
                 setGamePlayerIndex(gamePlayerIndex + 1);
                 setScreen('game'); 
             } else {
-                setScreen('scores'); 
+                if (round < totalRounds) {
+                    setRound(prev => prev + 1);
+                    setGamePlayerIndex(0);
+                    setScreen('scores');
+                } else {
+                    setScreen('end');
+                } 
             }
             }, 5000); 
             return () => clearTimeout(timer);
@@ -102,10 +118,10 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
         if (playerIndex + 1 < numberOfPlayers) {
             setPlayerIndex(playerIndex + 1);
             setIsReadyScreen(true);
-        } else {
+        } else  {
             onThemeSelected(allThemes);
             await handleAllThemesSubmitted(); 
-            setGamePlayerIndex(0); 
+            setGamePlayerIndex(0);
             setScreen('game');
         }
     };
@@ -132,6 +148,28 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
         setIsQuestionLoading(false);
     };
 
+    const sendScoresToDB = async () => {
+      try {
+        const entries = playerNames.map((name, index) => ({
+          name,
+          score: scores[index]
+        }));
+        await fetch(`http://localhost:3001/leaderboard/local/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entries })
+        });
+      } catch (err) {
+        console.error("Failed to submit scores", err);
+      }
+    };
+
+    const getLeaderBoard = () => {
+        fetch(`http://localhost:3001/leaderboard/top/${userId}`)
+        .then(res => res.json())
+        .then(data => setTopScores(data))
+            
+    }
 
     return (
         <div className="theme-screen">
@@ -220,14 +258,31 @@ export default function ThemeScreen({ onThemeSelected }: { onThemeSelected: (the
 
             {screen === 'scores' && (
             <div>
-                <h1>Score Screen</h1>
+                <h1>Round {round - 1}'s Score Screen</h1>
                 {playerNames.map((name, i) => (
                 <p key={i}>{name}: {scores[i]} point{scores[i] !== 1 ? 's' : ''}</p>
                 ))}
                 <button onClick={() => scoresRound()}>Next Round</button>
             </div>
             )}
+
+            {screen === 'end' && (
+            <div>
+                <h1>Thats the end of the Game here are the scores</h1>
+                {playerNames.map((name, i) => (
+                <p key={i}>{name}: {scores[i]} points</p>
+                ))}
+                <h1>Overall LeaderBoard: Your top 5 runs !</h1>
+                {topScores.map((entry, i) => (
+                    <p key={i}>
+                    {i + 1}. {entry.name} — {entry.score} point{entry.score !== 1 ? 's' : ''}
+                    </p>
+                ))}
+                <button onClick={onExit}>Go Home</button>
+            </div>
+            )}
         </div>
         );
 
 }
+

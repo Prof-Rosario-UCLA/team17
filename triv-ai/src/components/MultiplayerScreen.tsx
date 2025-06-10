@@ -324,12 +324,14 @@ export default function MultiplayerTest() {
         </div>
         
       )}
-
+      
       {screen === 'pass-n-play' && (
         <ThemeScreen onThemeSelected={(themes: string[]) => {
-          console.log('Selected themes:', themes);
+          console.log('Selected themes:', themes);}}
+          onExit={() => setScreen('local')}
+          userId = {userIdRef.current}
           // You can store or send these themes however you'd like
-        }} />
+         />
       )}
 
       {screen === 'lobby' && (
