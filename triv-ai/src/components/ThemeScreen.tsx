@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './ThemeScreen.css';
 import { initializeCanvas, addFloatingWord } from './ThemeCanvas';
 import { generateQuestionAndAnswers } from './GameScreen';

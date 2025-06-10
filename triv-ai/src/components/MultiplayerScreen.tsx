@@ -9,14 +9,13 @@ export default function MultiplayerTest() {
   const roomCodeRef = useRef<string | null>(null);
   const userIdRef = useRef<string | null>(null);
   const selectedAnswerRef = useRef('');
-
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [userId, setuserId] = useState<string | null>(null);
   const [playersReady, setplayersReady] = useState(0);
   const [numberPlayers, setnumberPlayers] = useState(0);
   const [joinCodeInput, setJoinCodeInput] = useState('');
-  const [status, setStatus] = useState('');
   const [themeInput, setThemeInput] = useState('');
   const [userName, setUserName] = useState('');
   const [screen, setScreen] = useState<'auth' | 'lobby' | 'ready' | 'theme' | 'game' | 'scores' | 'local'| 'pass-n-play'>('auth');
@@ -32,6 +31,16 @@ export default function MultiplayerTest() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [scores, setScores] = useState<{ [userId: string]: { name: string, points: number } }>({});
+
+  useEffect(() => {
+    const updateStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    return () => {
+      window.removeEventListener('online', updateStatus);
+      window.removeEventListener('offline', updateStatus);
+    };
+  }, []);
 
 
   useEffect(() => {
@@ -159,7 +168,6 @@ export default function MultiplayerTest() {
 
           break;
         case 'ERROR':
-          setStatus(`Error: ${msg.message}`);
           break;
       }
     };
@@ -177,17 +185,6 @@ export default function MultiplayerTest() {
       initializeCanvas();
     }
   }, [screen]);
-
-  const handleCreateUser = () => {
-    const id = crypto.randomUUID();   
-    setuserId(id);   
-
-    socketRef.current?.send(JSON.stringify({
-      type: 'CREATE_USER',
-      userId: id,
-      userName,
-    }));
-  };
 
   const createRoom = () => {
     socketRef.current?.send(JSON.stringify({
@@ -274,6 +271,12 @@ export default function MultiplayerTest() {
         </div>
       )}
       <h1 className="text-2xl font-bold">Triv.ai</h1>
+
+      {!isOnline && (
+        <div className="offline-banner">
+          <p>You're offline. We'll reconnect when you're back online...</p>
+        </div>
+      )}
 
       {screen === 'auth' && (
         // <div>

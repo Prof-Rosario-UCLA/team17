@@ -1,7 +1,3 @@
-import { useState, useEffect } from 'react';
-import AuthScreen from './components/AuthScreen';
-import ThemeScreen from './components/ThemeScreen';
-import { generateQuestionAndAnswers } from './components/GameScreen';
 
 import MultiplayerScreen from './components/MultiplayerScreen';
 import "./App.css";

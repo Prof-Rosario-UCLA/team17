@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { GoogleLogin, googleLogout } from "@react-oauth/google";
+import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import "../App.css";
 
 export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }) {
-    const [user, setUser] = useState<any | null>(null);
-
     // useEffect(() => {
     //     // Check if user info exists in localStorage or session (your auth logic here)
     //     const savedUser = localStorage.getItem("user");
     //     if (savedUser) {
     //         setUser(JSON.parse(savedUser));
     //     }
-    // }, []);
-
-    
-    
+    // }, []);    
     return (
         <div>
         
@@ -37,7 +31,6 @@ export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }
                                 picture: decoded.picture,
                                 email: decoded.email,        // optional but useful
                             };
-                            setUser(userInfo);
                             localStorage.setItem("user", JSON.stringify(userInfo));
                             onLogin(userInfo);
                         }
