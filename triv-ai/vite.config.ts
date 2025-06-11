@@ -41,7 +41,7 @@ export default defineConfig({
     
   ],
   server: {
-    https: false,  // ✅ Revert to HTTP
+    https: true,  // ✅ Revert to HTTP
     port: 5173,     // optional, use your preferred port
   },
   define: {

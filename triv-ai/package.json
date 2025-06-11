@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js"
+    "main": "index.js",
+    "start": "node index.js"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",

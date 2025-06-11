@@ -3,8 +3,8 @@ import http from 'http';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import Room from './roomModel.js';
-import User from './userModel.js';
+import Room from './src/server/roomModel.js';
+import User from './src/server/userModel.js';
 import OpenAI from 'openai';
 
 
@@ -343,4 +343,8 @@ app.get('/leaderboard/top/:userId', async (req, res) => {
     console.error(err);
     res.status(500).send('Failed to fetch leaderboard');
   }
+});
+
+app.get('/_ah/ready', (req, res) => {
+  res.status(200).send('OK');
 });

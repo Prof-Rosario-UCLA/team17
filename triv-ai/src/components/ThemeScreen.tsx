@@ -154,7 +154,7 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
           name,
           score: scores[index]
         }));
-          await fetch(`wss://cs144-25s-emanuelzavalza.uw.r.appspot.com/leaderboard/local/${userId}`, {
+          await fetch(`https://cs144-25s-emanuelzavalza.uw.r.appspot.com/leaderboard/local/${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ entries })
@@ -165,7 +165,7 @@ export default function ThemeScreen({ onThemeSelected, onExit, userId }: { onThe
     };
 
     const getLeaderBoard = () => {
-        fetch(`wss://cs144-25s-emanuelzavalza.uw.r.appspot.com/leaderboard/top/${userId}`)
+        fetch(`https://cs144-25s-emanuelzavalza.uw.r.appspot.com/leaderboard/top/${userId}`)
         .then(res => res.json())
         .then(data => setTopScores(data))
             

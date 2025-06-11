@@ -1,21 +1,27 @@
 runtime: nodejs20
 
-# env_variables:
-#   NODE_ENV: "production"
-  # OPENAI_API_KEY: "your-api-key-here"
-  # MONGODB_URI: "your-mongo-uri-here"
 
 handlers:
   - url: /.*
     script: auto
+
+# handlers:
     
-  - url: /
-    static_files: dist/index.html
-    upload: dist/index.html
+  # - url: /
+  #   static_files: dist/index.html
+  #   upload: dist/index.html
 
-  - url: /
-    static_dir: dist
+  # - url: /
+  #   static_dir: dist
 
-  - url: /
-    static_files: dist/\1
-    upload: dist/(.*)
+  # - url: /
+  #   static_files: dist/\1
+  #   upload: dist/(.*)
+  
+readiness_check:
+  path: '/_ah/ready'
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 300
