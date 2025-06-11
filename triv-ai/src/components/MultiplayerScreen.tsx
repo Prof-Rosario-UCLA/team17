@@ -55,7 +55,7 @@ export default function MultiplayerTest() {
   }, [selectedAnswer]);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3001');
+    const socket = new WebSocket('wss://cs144-25s-emanuelzavalza.uw.r.appspot.com');
     socketRef.current = socket;
     
     const savedUser = localStorage.getItem("user");
