@@ -1,23 +1,19 @@
 runtime: nodejs20
 
+entrypoint: npm start
 
 handlers:
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+
+  - url: /(.*)
+    static_files: dist/\1
+    upload: dist/(.*)
+
   - url: /.*
     script: auto
 
-# handlers:
-    
-  # - url: /
-  #   static_files: dist/index.html
-  #   upload: dist/index.html
-
-  # - url: /
-  #   static_dir: dist
-
-  # - url: /
-  #   static_files: dist/\1
-  #   upload: dist/(.*)
-  
 readiness_check:
   path: '/_ah/ready'
   check_interval_sec: 5

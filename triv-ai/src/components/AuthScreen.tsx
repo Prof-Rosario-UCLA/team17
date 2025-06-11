@@ -16,7 +16,7 @@ export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }
             {/* <h1 className="text-5xl font-extrabold mb-4 drop-shadow-lg">Triv.AI</h1> */}
             <header className="welcome-heading">Triv<span className="username">.ai</span></header>
             <p className="text-lg mb-10">Sign in with Google to play!</p>
-            <div className="">
+            <div className="flex flex-col items-center justify-center space-y-2">
                 <GoogleLogin
                     theme="filled_black"
                     text="signin_with"
