@@ -40,6 +40,8 @@ export default function AuthScreen({ onLogin }: { onLogin: (user: any) => void }
                         console.log("Login Failed");
                     }}
                 />
+
+                <p>Note: We use cookies to store your basic Google login data for gameplay.</p>
             </div>
         </div>
     );
