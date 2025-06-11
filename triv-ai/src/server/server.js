@@ -3,8 +3,8 @@ import http from 'http';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import Room from './src/server/roomModel.js';
-import User from './src/server/userModel.js';
+import Room from './roomModel.js';
+import User from './userModel.js';
 import OpenAI from 'openai';
 
 

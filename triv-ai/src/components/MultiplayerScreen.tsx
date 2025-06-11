@@ -25,6 +25,8 @@ export default function MultiplayerTest() {
   const themeIntervalRef = useRef<number | null>(null);
   const gameIntervalRef = useRef<number | null>(null);
   const scoreIntervalRef = useRef<number | null>(null);
+  // const [cookieBannerDismissed, setCookieBannerDismissed] = useState(false);
+
 
   // const [usedTheme, setUsedTheme] = useState(['']);
   // const [setUsedTheme] = useState(['']);
@@ -327,13 +329,31 @@ export default function MultiplayerTest() {
       {screen === 'local' && (
         <div className="flex flex-col items-center justify-center text-center space-y-4">
         <h1 className='welcome-heading'> Triv<span className='username'>.ai</span> </h1>
+        
           <button
           className="menu-button"
           onClick={() => setScreen('pass-n-play')}
           > Local Play</button>
+
           <button 
           className="menu-button"
-          onClick={multiplayer}> Multiplayer </button>
+          onClick={multiplayer}
+          > Multiplayer </button>
+
+          <p>We use cookies to store your basic Google login data for gameplay.</p>
+          {/* {!cookieBannerDismissed && (
+            <div className="fixed bottom-4 left-4 right-4 bg-gray-800 text-white text-sm p-4 rounded shadow-lg flex justify-between items-center z-50">
+              <span>
+                We use cookies to store your basic Google login data for gameplay.
+              </span>
+              <button
+                onClick={() => setCookieBannerDismissed(true)}
+                className="ml-4 px-3 py-1 bg-white text-gray-800 rounded hover:bg-gray-200"
+              >
+                Got it
+              </button>
+            </div>
+          )} */}
         </div>
       )}
       
