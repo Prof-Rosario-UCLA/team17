@@ -6,7 +6,7 @@ handlers:
     upload: dist/index.html
 
   - url: /
-    statis_dir: dist
+    static_dir: dist
 
   - url: /
     static_files: dist/\1

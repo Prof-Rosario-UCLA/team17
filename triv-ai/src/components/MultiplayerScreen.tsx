@@ -26,7 +26,8 @@ export default function MultiplayerTest() {
   const gameIntervalRef = useRef<number | null>(null);
   const scoreIntervalRef = useRef<number | null>(null);
 
-  const [usedTheme, setUsedTheme] = useState(['']);
+  // const [usedTheme, setUsedTheme] = useState(['']);
+  // const [setUsedTheme] = useState(['']);
   const [question, setQuestion] = useState('');
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -130,7 +131,7 @@ export default function MultiplayerTest() {
           if (msg.themes) addFloatingWord(msg.themes);
           break;
         case 'QUESTION_SENT':
-          if(msg.themes) setUsedTheme(msg.themes);
+          // if(msg.themes) setUsedTheme(msg.themes);
           if(msg.question) setQuestion(msg.question);
           if(msg.answer) setAnswers(msg.answer);
           setScreen('game');
