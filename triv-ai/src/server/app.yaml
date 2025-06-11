@@ -1,7 +1,0 @@
-runtime: nodejs16 # Or another supported Node.js runtime
-app_start_timeout_sec: 1800
-instance_class: F1
-service: default #defaults to "default" if not specified.
-handlers:
-  - url: /.*
-    script: auto
