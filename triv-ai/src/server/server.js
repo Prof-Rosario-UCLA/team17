@@ -22,7 +22,7 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 const openai = new OpenAI({ 
-  apiKey: "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",  //add this key to db
+  apiKey: "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",  //add this key to db
   dangerouslyAllowBrowser: true,   //only keep this here while in development wil need to store key in backend soon
 });
 
